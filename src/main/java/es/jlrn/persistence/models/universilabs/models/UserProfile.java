@@ -1,0 +1,68 @@
+package es.jlrn.persistence.models.universilabs.models;
+
+import es.jlrn.persistence.models.users.models.UserEntity;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import lombok.*;
+
+@Entity
+@Table(name = "user_profiles")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class UserProfile {
+//
+    @Id
+    private Long userId;
+
+    @OneToOne(optional = false)
+    @MapsId
+    @JoinColumn(name = "user_id", nullable = false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @com.fasterxml.jackson.annotation.JsonBackReference // Evita recursividad infinita
+    private UserEntity user;
+
+    @NotBlank(message = "El nombre no puede estar vacío")
+    @Size(max = 100, message = "El nombre no puede exceder los 100 caracteres")
+    @Column(length = 100)
+    private String firstName;
+
+    @NotBlank(message = "El apellido no puede estar vacío")
+    @Size(max = 100, message = "El apellido no puede exceder los 100 caracteres")
+    @Column(length = 100)
+    private String lastName;
+
+    // @Pattern(
+    //     regexp = "^(\\+\\d{1,3}[- ]?)?\\d{7,15}$",
+    //     message = "El teléfono debe ser válido"
+    // )
+    @Pattern(
+        regexp = "^$|^(\\+\\d{1,3}[- ]?)?\\d{7,15}$",
+        message = "El teléfono debe ser válido"
+    )
+    @Column(length = 20)
+    private String phone;
+
+    @Size(max = 500, message = "La URL del avatar no puede exceder los 500 caracteres")
+    // @Pattern(
+    //     regexp = "^(https?://)?([\\w\\d-]+\\.)+[\\w-]+(/[\\w\\d#?=&%+.-]*)?$",
+    //     message = "La URL del avatar debe ser válida"
+    // )
+    @Pattern(
+        // El "^$|" al principio significa: "Acepta vacío O el resto del patrón"
+        regexp = "^$|^(https?://)?([\\w\\d-]+\\.)+[\\w-]+(/[\\w\\d#?=&%+.-]*)?$",
+        message = "La URL del avatar debe ser válida"
+    )
+    @Column(length = 500)
+    private String avatarUrl;
+
+    @PrePersist
+    @PreUpdate
+    public void preClean() {
+        if (this.phone != null && this.phone.isEmpty()) this.phone = null;
+        if (this.avatarUrl != null && this.avatarUrl.isEmpty()) this.avatarUrl = null;
+    }
+}
