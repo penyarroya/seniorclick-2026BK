@@ -1,6 +1,8 @@
 package es.jlrn.persistence.models.users.repositories;
 
 import es.jlrn.persistence.models.users.models.UserEntity;
+import es.jlrn.presentation.users.dtos.Usuarios.UsersProfileDTO;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -89,4 +91,10 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
         "LEFT JOIN FETCH r.permissions " +
         "WHERE u.email = :input OR u.username = :input")
     Optional<UserEntity> findByEmailOrUsernameWithRoles(@Param("input") String input);
+
+    @Query("SELECT u FROM UserEntity u " +
+       "LEFT JOIN FETCH u.profile p " +
+       "LEFT JOIN FETCH u.roles r " +
+       "WHERE u.username = :username OR u.email = :username")
+    Optional<UserEntity> findUserProfileByUsername(@Param("username") String username);
 }

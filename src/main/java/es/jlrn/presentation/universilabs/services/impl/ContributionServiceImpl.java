@@ -46,6 +46,21 @@ public class ContributionServiceImpl implements IContributionService {
                 .toList();
     }
 
+    // --- NUEVO MÉTODO PARA "MIS APORTACIONES" ---
+    @Override
+    @Transactional(readOnly = true)
+    public List<ContributionResponseDTO> getByUser(Long userId) {
+        // Verificamos que el usuario existe antes de buscar
+        if (!userRepository.existsById(userId)) {
+            throw new ResourceNotFoundException("Usuario no encontrado");
+        }
+
+        // Buscamos sus aportaciones usando el repositorio ordenado
+        return contributionRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
+                .map(contributionMapper::toResponseDTO)
+                .toList();
+    }
+
     @Override
     @Transactional
     public ContributionResponseDTO save(ContributionRequestDTO dto) {

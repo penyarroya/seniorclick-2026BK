@@ -324,25 +324,35 @@ public class AuthController {
     //     ));
     // }
 
-   @GetMapping("/me")
-    public ResponseEntity<Map<String, Object>> getCurrentUser(Authentication authentication) {
+//    @GetMapping("/me")
+//     public ResponseEntity<Map<String, Object>> getCurrentUser(Authentication authentication) {
+//         if (authentication == null || !authentication.isAuthenticated()) {
+//             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+//         }
+
+//         // Llamamos al service, NO al repository directamente
+//         var user = authService.getCurrentUser(authentication.getName());
+//         var profile = user.getProfile(); 
+
+//         return ResponseEntity.ok(Map.of(
+//                 "userId", user.getId(),
+//                 "username", user.getUsername(),
+//                 "email", user.getEmail(),
+//                 "firstName", profile != null ? profile.getFirstName() : "",
+//                 "lastName", profile != null ? profile.getLastName() : "",
+//                 "avatarUrl", (profile != null && profile.getAvatarUrl() != null) ? profile.getAvatarUrl() : "",
+//                 "roles", user.getRoles().stream().map(r -> r.getName()).toList()
+//         ));
+//     }
+
+    @GetMapping("/me")
+    public ResponseEntity<UsersProfileDTO> getCurrentUser(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-
-        // Llamamos al service, NO al repository directamente
-        var user = authService.getCurrentUser(authentication.getName());
-        var profile = user.getProfile(); 
-
-        return ResponseEntity.ok(Map.of(
-                "userId", user.getId(),
-                "username", user.getUsername(),
-                "email", user.getEmail(),
-                "firstName", profile != null ? profile.getFirstName() : "",
-                "lastName", profile != null ? profile.getLastName() : "",
-                "avatarUrl", (profile != null && profile.getAvatarUrl() != null) ? profile.getAvatarUrl() : "",
-                "roles", user.getRoles().stream().map(r -> r.getName()).toList()
-        ));
+        // El AuthService ya devuelve el DTO limpio con roles y perfil
+        UsersProfileDTO profileDTO = authService.getUserProfile(authentication.getName());
+        return ResponseEntity.ok(profileDTO);
     }
 
     // -------------------- COOKIE CREATOR --------------------

@@ -12,4 +12,12 @@ public interface ContributionRepository extends JpaRepository<Contribution, Long
     //Collection<ContributionResponseDTO> findAllByOrderByCreatedAtDesc();
 
     List<Contribution> findAllByOrderByCreatedAtDesc();
+
+    /**
+     * MÉTODO CLAVE: Busca las aportaciones de un usuario específico.
+     * Esto solucionará el error en tu Service para la opción "Mis Aportaciones".
+     */
+    List<Contribution> findByUserIdOrderByCreatedAtDesc(Long userId);
+
+    
 }

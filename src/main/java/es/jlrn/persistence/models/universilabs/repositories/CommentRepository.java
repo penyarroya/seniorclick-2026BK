@@ -20,6 +20,13 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      */
     List<Comment> findByUserId(Long userId);
 
-    // AÑADE ESTE: Para la lista global de moderación
+    // Para la sección "Mis Aportaciones" (Comunidad)
+    // Cambiamos el original por uno ordenado:
+    List<Comment> findByUserIdOrderByCreatedAtDesc(Long userId);
+
+    // Para la lista global de moderación o el feed de comunidad
     List<Comment> findAllByOrderByCreatedAtDesc();
+    
+    // Útil para mostrar un badge de "X comentarios" en la lista de páginas
+    long countByPageId(Long pageId);
 }

@@ -1,7 +1,9 @@
 package es.jlrn.presentation.universilabs.dtos.userprofile;
 
 import jakarta.validation.constraints.*;
+import lombok.Builder;
 
+@Builder
 public record UserProfileDTO(
 //    
     Long userId,

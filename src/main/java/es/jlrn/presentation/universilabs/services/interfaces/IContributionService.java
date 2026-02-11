@@ -8,6 +8,7 @@ import es.jlrn.presentation.universilabs.dtos.contributions.ContributionResponse
 public interface IContributionService {
 //    
     List<ContributionResponseDTO> getByPage(Long pageId);
+    public List<ContributionResponseDTO> getByUser(Long userId);
     ContributionResponseDTO save(ContributionRequestDTO dto);
     void delete(Long id);
     List<ContributionResponseDTO> list();

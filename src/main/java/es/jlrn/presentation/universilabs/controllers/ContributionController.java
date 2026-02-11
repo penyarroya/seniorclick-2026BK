@@ -29,6 +29,16 @@ public class ContributionController {
     }
 
     /**
+     * NUEVO MÉTODO PARA "MIS APORTACIONES" (Comunidad)
+     * GET /api/contributions/user/{userId}
+     * Este es el endpoint que llamará tu Angular para mostrar el historial del usuario.
+     */
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<ContributionResponseDTO>> getByUser(@PathVariable Long userId) {
+        return ResponseEntity.ok(contributionService.getByUser(userId));
+    }
+
+    /**
      * Obtiene todas las contribuciones de una página específica.
      * GET /api/contributions/page/{pageId}
      */

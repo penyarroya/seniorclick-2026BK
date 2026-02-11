@@ -15,7 +15,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import es.jlrn.configuration.auth.dtos.AuthResponseDTO;
 import es.jlrn.configuration.auth.dtos.ForgotPasswordResponseDTO;
 import es.jlrn.configuration.auth.dtos.LoginRequestDTO;
@@ -32,6 +31,7 @@ import es.jlrn.persistence.models.users.repositories.RefreshTokenRepository;
 import es.jlrn.persistence.models.users.repositories.RoleRepository;
 import es.jlrn.persistence.models.users.repositories.UserRepository;
 import es.jlrn.presentation.users.dtos.Usuarios.UserVerificationDTO;
+import es.jlrn.presentation.users.dtos.Usuarios.UsersProfileDTO;
 import es.jlrn.presentation.users.services.impl.EmailServiceImpl;
 import es.jlrn.presentation.users.services.impl.UserCleanupServiceImpl;
 import jakarta.transaction.Transactional;
@@ -827,15 +827,30 @@ public class AuthService {
         return updated > 0;
     }
 
-    //
-    // public UserEntity getCurrentUser(String username) {
-    //     return userRepository.findByUsername(username)
-    //             .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
-    // }
-
     public UserEntity getCurrentUser(String username) {
         // Esta es la clave para que el Controller no falle al acceder a roles o perfil
         return userRepository.findByEmailOrUsernameWithRoles(username)
                 .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado: " + username));
+    }
+
+    /**
+     * Obtiene el perfil completo del usuario cargando roles y perfil 
+     * en una sola consulta para evitar errores de inicialización perezosa.
+     */
+    public UsersProfileDTO getUserProfile(String username) {
+        UserEntity user = userRepository.findUserProfileByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
+
+        return UsersProfileDTO.builder()
+                .userId(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .firstName(user.getProfile() != null ? user.getProfile().getFirstName() : "")
+                .lastName(user.getProfile() != null ? user.getProfile().getLastName() : "")
+                .avatarUrl(user.getProfile() != null ? user.getProfile().getAvatarUrl() : "")
+                .roles(user.getRoles().stream()
+                        .map(RoleEntity::getName)
+                        .toList())
+                .build();
     }
 }

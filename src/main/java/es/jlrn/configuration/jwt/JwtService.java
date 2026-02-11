@@ -10,6 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import es.jlrn.persistence.enums.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -33,19 +34,54 @@ public class JwtService {
     @Value("${jwt.expiration}")
     private int EXPIRATION;
 
+    // public String generateToken(UserDetails userDetails) {
+    //     return generateToken(new HashMap<>(), userDetails);
+    // }
+
+    // public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+    //     return Jwts.builder()
+    //             .claims(extraClaims)
+    //             .subject(userDetails.getUsername())
+    //             .issuedAt(new Date(System.currentTimeMillis()))
+    //             .expiration(new Date(System.currentTimeMillis() + EXPIRATION * 1000L))
+    //             .signWith(getSignInKey(), Jwts.SIG.HS256)
+    //             .compact();
+    // }
+
+    // 1. Genera el token extrayendo SOLO los nombres oficiales de tus Roles
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+        Map<String, Object> extraClaims = new HashMap<>();
+        
+        // Obtenemos los nombres definidos en tu Enum Role: [SUPER_ADMIN, ADMIN, USER, MODERATOR, MANAGER]
+        List<String> validRoleNames = java.util.stream.Stream.of(Role.values())
+                .map(Enum::name)
+                .toList();
+
+        // Filtramos las authorities para quedarnos solo con las que coinciden con tus Roles
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .map(auth -> auth.replace("ROLE_", "")) // Limpiamos para comparar
+                .filter(validRoleNames::contains)      // SOLO pasan los que están en tu Enum Role
+                .toList();
+        
+        // Ahora el token solo tendrá ["SUPER_ADMIN"], eliminando permisos como "MANAGE"
+        extraClaims.put("roles", roles); 
+        
+        return generateToken(extraClaims, userDetails);
     }
 
+    // 2. El motor genérico se mantiene igual
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts.builder()
                 .claims(extraClaims)
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + EXPIRATION * 1000L))
+                .expiration(new Date(System.currentTimeMillis() + EXPIRATION * 1000L)) 
                 .signWith(getSignInKey(), Jwts.SIG.HS256)
                 .compact();
     }
+
+
 
     // Método para generar el token con roles incluidos en los claims
     public String generateTokenWithRoles(UserDetails userDetails, List<String> roles) {
@@ -87,7 +123,7 @@ public class JwtService {
         return getClaim(token, Claims::getExpiration);
     }
 
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         return getExpiration(token).before(new Date());
     }
 
