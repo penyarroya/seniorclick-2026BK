@@ -47,14 +47,10 @@ public class UserProfile {
     private String phone;
 
     @Size(max = 500, message = "La URL del avatar no puede exceder los 500 caracteres")
-    // @Pattern(
-    //     regexp = "^(https?://)?([\\w\\d-]+\\.)+[\\w-]+(/[\\w\\d#?=&%+.-]*)?$",
-    //     message = "La URL del avatar debe ser válida"
-    // )
     @Pattern(
-        // El "^$|" al principio significa: "Acepta vacío O el resto del patrón"
-        regexp = "^$|^(https?://)?([\\w\\d-]+\\.)+[\\w-]+(/[\\w\\d#?=&%+.-]*)?$",
-        message = "La URL del avatar debe ser válida"
+        // Acepta: vacío OR (cualquier ruta que empiece por http, assets, o carpetas estándar)
+        regexp = "^$|^(https?://|/|[a-zA-Z0-9_-]+/).*$",
+        message = "La URL o ruta local del avatar no es válida"
     )
     @Column(length = 500)
     private String avatarUrl;

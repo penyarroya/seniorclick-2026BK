@@ -1,7 +1,6 @@
 package es.jlrn.persistence.models.users.repositories;
 
 import es.jlrn.persistence.models.users.models.UserEntity;
-import es.jlrn.presentation.users.dtos.Usuarios.UsersProfileDTO;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
