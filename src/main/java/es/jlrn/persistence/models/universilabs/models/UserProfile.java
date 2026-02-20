@@ -1,5 +1,8 @@
 package es.jlrn.persistence.models.universilabs.models;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import es.jlrn.persistence.models.users.models.UserEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -20,6 +23,7 @@ public class UserProfile {
     @OneToOne(optional = false)
     @MapsId
     @JoinColumn(name = "user_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE) 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @com.fasterxml.jackson.annotation.JsonBackReference // Evita recursividad infinita
@@ -35,10 +39,6 @@ public class UserProfile {
     @Column(length = 100)
     private String lastName;
 
-    // @Pattern(
-    //     regexp = "^(\\+\\d{1,3}[- ]?)?\\d{7,15}$",
-    //     message = "El teléfono debe ser válido"
-    // )
     @Pattern(
         regexp = "^$|^(\\+\\d{1,3}[- ]?)?\\d{7,15}$",
         message = "El teléfono debe ser válido"

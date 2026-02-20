@@ -37,6 +37,7 @@ public class UserProgress {
     // CAMBIO CLAVE: Ahora el progreso pertenece a una inscripción
     @ManyToOne(optional = false)
     @JoinColumn(name = "enrollment_id", nullable = false)
+    @org.hibernate.annotations.OnDelete(action = org.hibernate.annotations.OnDeleteAction.CASCADE)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @JsonIgnoreProperties({"user"})
@@ -44,6 +45,7 @@ public class UserProgress {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "page_id", nullable = false)
+    @org.hibernate.annotations.OnDelete(action = org.hibernate.annotations.OnDeleteAction.CASCADE)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Page page;

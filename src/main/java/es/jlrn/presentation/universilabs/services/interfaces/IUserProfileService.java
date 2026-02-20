@@ -11,4 +11,5 @@ public interface IUserProfileService {
     UserProfileDTO createProfile(Long userId, UserProfileDTO dto);
     void deleteProfile(Long userId);
     Page<UserProfileDTO> findAll(Pageable pageable);
+    UserProfileDTO getProfileByUsername(String username);
 }

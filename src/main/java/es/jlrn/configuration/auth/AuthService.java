@@ -765,31 +765,73 @@ public class AuthService {
     // }
 
 
+    // 
+    //@Transactional
+    // public void logout(String refreshTokenStr) {
+    //     // 1. Buscamos el token de forma segura
+    //     refreshTokenRepository.findByToken(refreshTokenStr).ifPresent(refreshToken -> {
+    //         UserEntity user = refreshToken.getUser();
+
+    //         // 2. Marcamos el token actual como revocado con su marca de tiempo
+    //         refreshToken.setRevoked(true);
+    //         refreshToken.setRevokedAt(LocalDateTime.now());
+    //         refreshTokenRepository.save(refreshToken);
+
+    //         // 3. OPCIONAL: Por seguridad extrema, invalidamos TODOS sus tokens activos
+    //         // Esto evita que si el usuario tenía sesiones abiertas en otros navegadores, 
+    //         // estas también se cierren (útil para "Cerrar todas las sesiones").
+    //         // refreshTokenRepository.revokeAllByUserId(user.getId(), LocalDateTime.now());
+
+    //         logger.info("Sesión cerrada y token revocado para el usuario: {} (ID: {})", 
+    //                     user.getUsername(), user.getId());
+    //     });
+        
+    //     // Si no se encuentra el token, el método termina en silencio. 
+    //     // Esto es correcto para evitar que el cliente reciba un error si intenta 
+    //     // desloguearse dos veces seguidas.
+    // }
+
+    // @Transactional
+    // public void logout(String refreshTokenStr) {
+    //     // 1. Buscamos el token en la base de datos
+    //     refreshTokenRepository.findByToken(refreshTokenStr).ifPresent(refreshToken -> {
+    //         UserEntity user = refreshToken.getUser();
+
+    //         // 2. Marcamos el token como revocado con fecha y hora
+    //         refreshToken.setRevoked(true);
+    //         refreshToken.setRevokedAt(LocalDateTime.now());
+    //         refreshTokenRepository.save(refreshToken);
+
+    //         // 3. OPCIONAL: Si quieres cerrar sesión en todos los dispositivos a la vez:
+    //         // refreshTokenRepository.revokeAllByUserId(user.getId(), LocalDateTime.now());
+
+    //         logger.info("Logout exitoso: Refresh Token revocado para el usuario {} (ID: {})", 
+    //                     user.getUsername(), user.getId());
+    //     });
+        
+    //     // Si no se encuentra el token (ej. ya se borró o es nulo), 
+    //     // terminamos en silencio por seguridad y para no romper la experiencia del usuario.
+    // }
+
     @Transactional
     public void logout(String refreshTokenStr) {
-        // 1. Buscamos el token de forma segura
-        refreshTokenRepository.findByToken(refreshTokenStr).ifPresent(refreshToken -> {
-            UserEntity user = refreshToken.getUser();
+        // 1. Buscamos el token que el usuario está usando para salir
+        RefreshTokenEntity refreshToken = refreshTokenRepository.findByToken(refreshTokenStr)
+                .orElseThrow(() -> new InvalidTokenException("Refresh token no encontrado"));
 
-            // 2. Marcamos el token actual como revocado con su marca de tiempo
-            refreshToken.setRevoked(true);
-            refreshToken.setRevokedAt(LocalDateTime.now());
-            refreshTokenRepository.save(refreshToken);
-
-            // 3. OPCIONAL: Por seguridad extrema, invalidamos TODOS sus tokens activos
-            // Esto evita que si el usuario tenía sesiones abiertas en otros navegadores, 
-            // estas también se cierren (útil para "Cerrar todas las sesiones").
-            // refreshTokenRepository.revokeAllByUserId(user.getId(), LocalDateTime.now());
-
-            logger.info("Sesión cerrada y token revocado para el usuario: {} (ID: {})", 
-                        user.getUsername(), user.getId());
-        });
+        // 2. En lugar de borrar al usuario, "quemamos" el token
+        // Marcamos el token como revocado para que no sirva más
+        refreshToken.setRevoked(true);
+        refreshToken.setRevokedAt(LocalDateTime.now());
         
-        // Si no se encuentra el token, el método termina en silencio. 
-        // Esto es correcto para evitar que el cliente reciba un error si intenta 
-        // desloguearse dos veces seguidas.
-    }
+        refreshTokenRepository.save(refreshToken);
 
+        // OPCIONAL: Si quieres cerrar sesión en TODOS los dispositivos a la vez:
+        // refreshTokenRepository.deleteByUser(refreshToken.getUser());
+
+        logger.info("Sesión invalidada para el usuario: {}", refreshToken.getUser().getUsername());
+    }
+    
     //
     private void setupVerification(UserEntity user) {
         String code = generateVerificationCode();

@@ -12,5 +12,9 @@ public interface ICommentService {
     
     void delete(Long id);
 
+    void toggleResolved(Long id);
+
     List<CommentResponseDTO> findAll();
+
+    List<CommentResponseDTO> findUnresolved();
 }

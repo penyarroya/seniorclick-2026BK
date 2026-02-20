@@ -30,6 +30,7 @@ public class Subtopic {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "topic_id", nullable = false)
+    @org.hibernate.annotations.OnDelete(action = org.hibernate.annotations.OnDeleteAction.CASCADE)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Topic topic;

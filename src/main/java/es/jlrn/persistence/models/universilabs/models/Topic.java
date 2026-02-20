@@ -30,6 +30,7 @@ public class Topic {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "collection_id", nullable = false)
+    @org.hibernate.annotations.OnDelete(action = org.hibernate.annotations.OnDeleteAction.CASCADE)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private CollectionEntity collection;

@@ -442,19 +442,6 @@ public class GlobalExceptionHandler {
 
     // ===================== CONSTRAINTS Y OTROS =====================
 
-    // @ExceptionHandler(DataIntegrityViolationException.class)
-    // public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
-    //     ex.printStackTrace();
-    //     String rootMessage = ex.getRootCause() != null ? ex.getRootCause().getMessage() : ex.getMessage();
-    //     return buildResponse(HttpStatus.CONFLICT, "Violación de integridad: " + rootMessage);
-    // }
-
-    // @ExceptionHandler(InvalidTokenException.class)
-    // public ResponseEntity<ErrorResponse> handleInvalidToken(InvalidTokenException ex) {
-    //     HttpStatus status = ex.isExpired() ? HttpStatus.GONE : HttpStatus.BAD_REQUEST;
-    //     return buildResponse(status, ex.getMessage());
-    // }
-
     @ExceptionHandler(InvalidTokenException.class)
     public ResponseEntity<ErrorResponse> handleInvalidToken(InvalidTokenException ex) {
         // IMPORTANTE: Cambiamos a UNAUTHORIZED (401) para que Angular 
@@ -490,25 +477,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, status);
     }
 
-    // @ExceptionHandler(DataIntegrityViolationException.class)
-    // public ResponseEntity<ErrorResponse> handleDataIntegrity(DataIntegrityViolationException ex) {
-    //     // Extraemos el mensaje más específico (la causa raíz en la DB)
-    //     String rootMessage = (ex.getRootCause() != null) ? ex.getRootCause().getMessage() : ex.getMessage();
-        
-    //     // Opcional: imprimir en consola para que tú como dev veas el error completo
-    //     // ex.printStackTrace(); 
-
-    //     ErrorResponse error = ErrorResponse.builder()
-    //             .timestamp(LocalDateTime.now())
-    //             .status(HttpStatus.CONFLICT.value())
-    //             .error("Data Integrity Violation")
-    //             .message("Error de consistencia en la base de datos: " + rootMessage)
-    //             .details(null)
-    //             .build();
-
-    //     return new ResponseEntity<>(error, HttpStatus.CONFLICT);
-    // }
-
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponse> handleDataIntegrity(DataIntegrityViolationException ex) {
         String rootMessage = (ex.getRootCause() != null) ? ex.getRootCause().getMessage() : ex.getMessage();
@@ -520,6 +488,12 @@ public class GlobalExceptionHandler {
         }
 
         return buildResponse(HttpStatus.CONFLICT, userMessage);
+    }
+
+    // Importante: Asegúrate de importar org.springframework.security.access.AccessDeniedException;
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(org.springframework.security.access.AccessDeniedException ex) {
+        return buildResponse(HttpStatus.FORBIDDEN, "No tienes permisos suficientes para realizar esta acción.");
     }
 
     @ExceptionHandler(RuntimeException.class)

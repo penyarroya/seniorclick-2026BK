@@ -63,6 +63,7 @@ public class Project {
     // Usuario que creó el proyecto
     @ManyToOne(optional = false)
     @JoinColumn(name = "created_by", nullable = false)
+    @org.hibernate.annotations.OnDelete(action = org.hibernate.annotations.OnDeleteAction.CASCADE) 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private UserEntity createdBy;

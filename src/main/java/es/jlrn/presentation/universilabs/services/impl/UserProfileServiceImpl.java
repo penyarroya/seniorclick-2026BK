@@ -163,21 +163,49 @@ public class UserProfileServiceImpl implements IUserProfileService {
     private final UserRepository userRepository;
     private final IUserProfileMapper profileMapper;
 
+    // @Override
+    // @Transactional(readOnly = true)
+    // public UserProfileDTO getProfile(Long userId) {
+    //     return profileRepository.findById(userId)
+    //             .map(profileMapper::toDTO)
+    //             .orElseGet(() -> UserProfileDTO.builder()
+    //                 .id(userId)
+    //                 .userId(userId)
+    //                 .firstName("")
+    //                 .lastName("")
+    //                 .phone("")
+    //                 .avatarUrl(null)
+    //                 .nombre("Usuario Nuevo")
+    //                 .activo(true)
+    //                 .build());
+    // }
+
+
+    @Transactional(readOnly = true)
+    public UserProfileDTO getProfileByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .map(user -> getProfile(user.getId()))
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado: " + username));
+    }
+
     @Override
     @Transactional(readOnly = true)
     public UserProfileDTO getProfile(Long userId) {
-        return profileRepository.findById(userId)
+        // CAMBIO: Buscar el usuario primero para acceder a su perfil vinculado
+        return userRepository.findById(userId)
+                .map(UserEntity::getProfile) // Accedemos al perfil desde el usuario
                 .map(profileMapper::toDTO)
-                .orElseGet(() -> UserProfileDTO.builder()
-                    .id(userId)
-                    .userId(userId)
-                    .firstName("")
-                    .lastName("")
-                    .phone("")
-                    .avatarUrl(null)
-                    .nombre("Usuario Nuevo")
-                    .activo(true)
-                    .build());
+                .orElseGet(() -> {
+                    // Si el usuario no tiene perfil, devolvemos el objeto por defecto
+                    return UserProfileDTO.builder()
+                        .id(userId)
+                        .userId(userId)
+                        .firstName("")
+                        .lastName("")
+                        .nombre("Usuario Nuevo")
+                        .activo(true)
+                        .build();
+                });
     }
 
     @Override

@@ -29,4 +29,30 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     
     // Útil para mostrar un badge de "X comentarios" en la lista de páginas
     long countByPageId(Long pageId);
+
+    /**
+     * IMPORTANTE: Obtiene solo los comentarios raíz (preguntas originales) 
+     * de una página. Las respuestas vendrán dentro de la lista 'replies' de cada objeto 
+     * gracias al FetchType de la entidad.
+     */
+    List<Comment> findByPageIdAndParentIsNullOrderByCreatedAtDesc(Long pageId);
+
+    /**
+     * Busca comentarios pendientes de resolver. 
+     * Ideal para el panel de administración/soporte de Ayuda y FAQ.
+     */
+    List<Comment> findByResolvedFalseOrderByCreatedAtAsc();
+
+    /**
+     * Cuenta cuántas preguntas (comentarios padre) hay en una página.
+     */
+    long countByPageIdAndParentIsNull(Long pageId);
+
+    /**
+     * Búsqueda por contenido para el buscador de la sección de Ayuda.
+     */
+    List<Comment> findByContentContainingIgnoreCase(String keyword);
+
+    // Si necesitas todos los comentarios de un hilo específico
+    List<Comment> findByParentIdOrderByCreatedAtAsc(Long parentId);
 }

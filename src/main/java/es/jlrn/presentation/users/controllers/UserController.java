@@ -3,12 +3,13 @@ package es.jlrn.presentation.users.controllers;
 import es.jlrn.configuration.auth.dtos.RegisterRequestDTO;
 import es.jlrn.presentation.users.dtos.Usuarios.*;
 import es.jlrn.presentation.users.services.interfaces.IUserService;
-
+import es.jlrn.presentation.users.services.interfaces.IsSuperAdmin;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -104,21 +105,6 @@ public class UserController {
     // =====================================
     // 🔹 ACTUALIZAR USUARIO
     // =====================================
-    // @PutMapping("/{id}")
-    // public ResponseEntity<UserDTO> update(
-    //         @PathVariable Long id,
-    //         @Valid @RequestBody UserUpdateDTO dto) {
-
-    //     // Validación mínima: al menos un campo debe estar presente
-    //     if (dto.getUsername() == null && dto.getEmail() == null &&
-    //         dto.getPassword() == null && dto.getRoles() == null && dto.getActivo() == null) {
-    //         return ResponseEntity.badRequest().body(null);
-    //     }
-
-    //     UserDTO updatedUser = userService.update(id, dto);
-    //     return ResponseEntity.ok(updatedUser);
-    // }
-    
     @PutMapping("/{id}")
     public ResponseEntity<UserDTO> update(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO dto) {
 
@@ -138,6 +124,9 @@ public class UserController {
     // =====================================
     // 🔹 BORRAR USUARIO
     // =====================================
+    // Usamos la anotación personalizada  @IsSuperAdmin para restringir el acceso a este endpoint, 
+    // es una interface que hemos creado para evitar repetir la lógica de seguridad en cada método
+    @IsSuperAdmin 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         userService.deleteById(id);
@@ -189,16 +178,7 @@ public class UserController {
     public ResponseEntity<UserDTO> removeRoleFromUser(@PathVariable Long id, @RequestParam String roleName) {
         return ResponseEntity.ok(userService.removeRoleFromUser(id, roleName));
     }
-
-    // =====================================
-    // 🔹 Crear usuario manual
-    // =====================================
-    // @PostMapping("/manual")
-    // public ResponseEntity<UserDTO> createManual(@Valid @RequestBody UserCreateDTO dto) {
-    //     UserEntity user = userService.createUserManual(dto);
-    //     return ResponseEntity.ok(userService.toDTO(user));
-    // }
-
+    
     // =====================================
     // 🔹 Crear usuario manual (ADMIN)
     // =====================================

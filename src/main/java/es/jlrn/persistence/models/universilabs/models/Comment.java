@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "comments")
@@ -28,6 +29,10 @@ public class Comment {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean resolved = false;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "page_id", nullable = false)
     @ToString.Exclude
@@ -39,4 +44,16 @@ public class Comment {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private UserEntity user;
+
+    /* NUEVO: Relación Jerárquica (Self-reference)
+       Permite que un comentario sea respuesta de otro.
+    */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Comment parent;
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> replies;
 }

@@ -2,6 +2,9 @@ package es.jlrn.persistence.models.users.models;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -35,6 +38,7 @@ public class RefreshTokenEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE) // Esto añade el CASCADE a nivel de base de datos
     private UserEntity user;
 
     @Column(nullable = false)

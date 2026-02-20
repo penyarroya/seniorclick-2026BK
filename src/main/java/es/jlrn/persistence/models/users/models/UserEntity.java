@@ -17,6 +17,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import es.jlrn.persistence.models.universilabs.models.UserProfile;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
@@ -81,13 +83,13 @@ public class UserEntity implements UserDetails {
 
 
     @NotEmpty
-    //@ManyToMany(fetch = FetchType.EAGER)
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "user_roles",
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @Builder.Default
     private Set<RoleEntity> roles = new HashSet<>();
 

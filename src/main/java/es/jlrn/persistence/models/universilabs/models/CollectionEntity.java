@@ -30,6 +30,7 @@ public class CollectionEntity {
 
     @ManyToOne(optional = false) // no puede existir colección sin proyecto
     @JoinColumn(name = "project_id", nullable = false)
+    @org.hibernate.annotations.OnDelete(action = org.hibernate.annotations.OnDeleteAction.CASCADE)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Project project;

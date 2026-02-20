@@ -145,6 +145,7 @@ package es.jlrn.configuration.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -157,6 +158,7 @@ import es.jlrn.configuration.jwt.JwtEntryPoint;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtTokenFilter;
@@ -196,7 +198,9 @@ public class SecurityConfig {
                 // .requestMatchers("/api/users/**").hasRole("ADMIN")
 
                 // Si prefieres mantener /api/users/** público por ahora:
-                .requestMatchers("/api/users/**").permitAll()
+                // .requestMatchers("/api/users/**").permitAll()
+                
+                .requestMatchers("/api/users/**").authenticated() // Requiere login pero no rol específico
 
                 // 3. RUTAS PROTEGIDAS: Requieren cualquier usuario autenticado
                 .requestMatchers(

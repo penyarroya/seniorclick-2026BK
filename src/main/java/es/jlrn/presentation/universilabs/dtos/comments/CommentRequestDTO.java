@@ -14,5 +14,8 @@ public record CommentRequestDTO(
     Long pageId,
 
     @NotNull(message = "El ID del usuario es obligatorio")
-    Long userId
+    Long userId,
+
+    // AÑADIDO: Opcional. Si viene, el comentario se guarda como respuesta.
+    Long parentId
 ) {}

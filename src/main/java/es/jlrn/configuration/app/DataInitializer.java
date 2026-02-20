@@ -126,6 +126,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.jlrn.persistence.enums.Permission;
 import es.jlrn.persistence.enums.Role;
+import es.jlrn.persistence.models.universilabs.models.UserProfile;
 import es.jlrn.persistence.models.users.models.PermissionEntity;
 import es.jlrn.persistence.models.users.models.RoleEntity;
 import es.jlrn.persistence.models.users.models.UserEntity;
@@ -213,7 +214,7 @@ public class DataInitializer {
     // Crear usuario SUPER_ADMIN por defecto
     // ====================
     private void crearUsuarioPorDefecto(Map<String, RoleEntity> rolesMap) {
-        String username = "pnry";
+        String username = "pnrya";
         if (userRepository.existsByUsername(username)) {
             log.info("ℹ️ Usuario por defecto ya existe: {}", username);
             return;
@@ -222,15 +223,31 @@ public class DataInitializer {
         RoleEntity superRole = rolesMap.get(Role.SUPER_ADMIN.name());
         if (superRole == null) throw new RuntimeException("❌ Rol no encontrado: SUPER_ADMIN");
 
+        // 1. Construir la entidad de Usuario (sin guardar todavía)
         UserEntity user = UserEntity.builder()
                 .username(username)
-                .email("nn@gmail.com")
-                .password(passwordEncoder.encode("12345678"))
+                .email("gamosa1956@gmail.com")
+                .password(passwordEncoder.encode("pnry1956!"))
                 .activo(true)
+                .emailVerified(true) // Al ser el admin inicial, lo marcamos como verificado
                 .roles(Set.of(superRole))
                 .build();
 
+        // 2. Construir el Perfil y VINCULARLO al usuario (Igual que en tu Register)
+        UserProfile profile = UserProfile.builder()
+                .user(user) 
+                .firstName("Pnry")
+                .lastName("SuperAdmin")
+                .phone("933756374")
+                .avatarUrl("img-profiles/Desierto.jpg") // Puedes dejarlo vacío o poner una URL por defecto
+                .build();
+
+        // 3. Establecer la relación bidireccional
+        user.setProfile(profile);
+
+        // 4. Guardar el usuario (El CascadeType.ALL en UserEntity guardará el perfil automáticamente)
         userRepository.save(user);
-        log.info("✅ Usuario SUPER_ADMIN creado: {}", username);
+        
+        log.info("✅ Usuario SUPER_ADMIN y su perfil creados correctamente: {}", username);
     }
 }

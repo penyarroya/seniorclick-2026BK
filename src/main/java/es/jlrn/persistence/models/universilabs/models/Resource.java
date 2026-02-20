@@ -48,6 +48,7 @@ public class Resource {
     // Relación con la página
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "page_id", nullable = false)
+    @org.hibernate.annotations.OnDelete(action = org.hibernate.annotations.OnDeleteAction.CASCADE)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Page page;

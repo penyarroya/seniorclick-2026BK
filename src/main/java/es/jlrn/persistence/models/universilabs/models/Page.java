@@ -35,9 +35,6 @@ public class Page {
     @Column(nullable = false)
     private PageFormat format = PageFormat.PLAIN_TEXT; // Valor por defecto
 
-    //@NotBlank(message = "El contenido de la página no puede estar vacío")
-    //@Size(max = 10000, message = "El contenido de la página no puede exceder los 10000 caracteres")
-    //@Column(columnDefinition = "TEXT", nullable = false)
     @NotBlank(message = "El contenido de la página no puede estar vacío")
     @Lob 
     @JdbcTypeCode(Types.LONGVARCHAR)
@@ -52,6 +49,7 @@ public class Page {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "author_id", nullable = false)
+    @org.hibernate.annotations.OnDelete(action = org.hibernate.annotations.OnDeleteAction.CASCADE) 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private UserEntity author;

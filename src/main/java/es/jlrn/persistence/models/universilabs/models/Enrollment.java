@@ -46,6 +46,7 @@ public class Enrollment {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id", nullable = false)
+    @org.hibernate.annotations.OnDelete(action = org.hibernate.annotations.OnDeleteAction.CASCADE) 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @JsonIgnoreProperties({"roles", "password", "authorities", "verificationCode", "passwordResetToken"})
@@ -53,6 +54,7 @@ public class Enrollment {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "project_id", nullable = false)
+    @org.hibernate.annotations.OnDelete(action = org.hibernate.annotations.OnDeleteAction.CASCADE)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Project project;
