@@ -506,5 +506,10 @@ public class GlobalExceptionHandler {
         // Para cualquier otra RuntimeException, devolvemos error interno
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Error de ejecución: " + ex.getMessage());
     }
-    
+
+    @ExceptionHandler(org.springframework.web.server.ResponseStatusException.class)
+    public ResponseEntity<ErrorResponse> handleResponseStatusException(org.springframework.web.server.ResponseStatusException ex) {
+        // ex.getReason() contiene el mensaje que pusimos en el Service
+        return buildResponse((HttpStatus) ex.getStatusCode(), ex.getReason());
+    }
 }

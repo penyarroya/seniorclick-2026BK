@@ -190,7 +190,8 @@ public class SecurityConfig {
                         "/api/progress/**", "/api/collections/**",
                         "/api/topics/**", "/api/subtopics/**",
                         "/api/pages/**", "/api/resources/**",
-                        "/api/user-progress/**"
+                        "/api/user-progress/**",
+                        "/api/comments/**"
                 ).permitAll()
 
                 // 2. RUTAS DE ADMINISTRADOR (Ejemplo de uso de roles)

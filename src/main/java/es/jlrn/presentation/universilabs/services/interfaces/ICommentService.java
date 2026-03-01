@@ -1,6 +1,8 @@
 package es.jlrn.presentation.universilabs.services.interfaces;
 
 import java.util.List;
+
+import es.jlrn.persistence.models.universilabs.models.Comment;
 import es.jlrn.presentation.universilabs.dtos.comments.CommentRequestDTO;
 import es.jlrn.presentation.universilabs.dtos.comments.CommentResponseDTO;
 
@@ -17,4 +19,6 @@ public interface ICommentService {
     List<CommentResponseDTO> findAll();
 
     List<CommentResponseDTO> findUnresolved();
+
+    Comment findById(Long id);
 }

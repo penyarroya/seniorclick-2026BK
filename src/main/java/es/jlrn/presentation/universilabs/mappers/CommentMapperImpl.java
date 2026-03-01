@@ -37,6 +37,57 @@
 // }
 
 
+// package es.jlrn.presentation.universilabs.mappers;
+
+// import org.springframework.stereotype.Component;
+// import es.jlrn.persistence.models.universilabs.models.Comment;
+// import es.jlrn.presentation.universilabs.dtos.comments.CommentRequestDTO;
+// import es.jlrn.presentation.universilabs.dtos.comments.CommentResponseDTO;
+// import es.jlrn.presentation.universilabs.mappers.interfaces.ICommentMapper;
+
+// import java.util.ArrayList;
+// import java.util.List;
+// import java.util.stream.Collectors;
+
+// @Component
+// public class CommentMapperImpl implements ICommentMapper {
+
+//     @Override
+//     public CommentResponseDTO toResponseDTO(Comment entity) {
+//         if (entity == null) return null;
+        
+//         // Mapeo recursivo de las respuestas (replies)
+//         List<CommentResponseDTO> repliesDTO = (entity.getReplies() != null)
+//             ? entity.getReplies().stream()
+//                 .map(this::toResponseDTO) // Se llama a sí mismo para cada hijo
+//                 .collect(Collectors.toList())
+//             : new ArrayList<>();
+
+//         return new CommentResponseDTO(
+//             entity.getId(),
+//             entity.getContent(),
+//             entity.getCreatedAt(),
+//             entity.isResolved(),        // Nuevo campo
+//             entity.getPage().getId(),
+//             entity.getUser().getId(),
+//             entity.getUser().getUsername(),
+//             repliesDTO                  // Lista de respuestas anidadas
+//         );
+//     }
+
+//     @Override
+//     public Comment toEntity(CommentRequestDTO dto) {
+//         if (dto == null) return null;
+        
+//         // El mapeo de parentId, Page y User se gestiona en el Service
+//         // para asegurar que los objetos existan en la base de datos.
+//         return Comment.builder()
+//             .content(dto.content())
+//             .build();
+//     }
+// }
+
+
 package es.jlrn.presentation.universilabs.mappers;
 
 import org.springframework.stereotype.Component;
@@ -51,27 +102,34 @@ import java.util.stream.Collectors;
 
 @Component
 public class CommentMapperImpl implements ICommentMapper {
-
+//
     @Override
     public CommentResponseDTO toResponseDTO(Comment entity) {
         if (entity == null) return null;
         
-        // Mapeo recursivo de las respuestas (replies)
-        List<CommentResponseDTO> repliesDTO = (entity.getReplies() != null)
-            ? entity.getReplies().stream()
-                .map(this::toResponseDTO) // Se llama a sí mismo para cada hijo
-                .collect(Collectors.toList())
-            : new ArrayList<>();
+        // 1. Mapeo recursivo de las respuestas (replies)
+        // Usamos una comprobación extra para evitar problemas con Lazy Loading de Hibernate
+        List<CommentResponseDTO> repliesDTO = new ArrayList<>();
+        if (entity.getReplies() != null) {
+            repliesDTO = entity.getReplies().stream()
+                .map(this::toResponseDTO) 
+                .collect(Collectors.toList());
+        }
+
+        // 2. Extraer datos con seguridad (Null-safe)
+        Long pageId = (entity.getPage() != null) ? entity.getPage().getId() : null;
+        Long userId = (entity.getUser() != null) ? entity.getUser().getId() : null;
+        String username = (entity.getUser() != null) ? entity.getUser().getUsername() : "Usuario desconocido";
 
         return new CommentResponseDTO(
             entity.getId(),
             entity.getContent(),
             entity.getCreatedAt(),
-            entity.isResolved(),        // Nuevo campo
-            entity.getPage().getId(),
-            entity.getUser().getId(),
-            entity.getUser().getUsername(),
-            repliesDTO                  // Lista de respuestas anidadas
+            entity.isResolved(),
+            pageId,
+            userId,
+            username,
+            repliesDTO // Aquí viaja toda la jerarquía
         );
     }
 
@@ -79,10 +137,9 @@ public class CommentMapperImpl implements ICommentMapper {
     public Comment toEntity(CommentRequestDTO dto) {
         if (dto == null) return null;
         
-        // El mapeo de parentId, Page y User se gestiona en el Service
-        // para asegurar que los objetos existan en la base de datos.
+        // Mapeamos lo básico; las relaciones complejas se resuelven en el Service
         return Comment.builder()
-            .content(dto.content())
+            .content(dto.content() != null ? dto.content().trim() : "")
             .build();
     }
 }

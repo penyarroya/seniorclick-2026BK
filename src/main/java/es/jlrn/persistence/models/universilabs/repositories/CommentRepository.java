@@ -55,4 +55,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     // Si necesitas todos los comentarios de un hilo específico
     List<Comment> findByParentIdOrderByCreatedAtAsc(Long parentId);
+    
+    // Para evitar duplicados: verifica si ya existe un comentario con el mismo contenido en la misma página
+    boolean existsByContentIgnoreCaseAndPageId(String content, Long pageId);
 }
